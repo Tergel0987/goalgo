@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>ChemLab - Шалгалт</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #0E1729;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+    
+        }
+
+        h1 {
+            font-size: 40px;
+        }
+
+        h1 span {
+            color: #00d4ff;
+        }
+
+        .question-box {
+            background-color: #161F32;
+            padding: 20px;
+            border-radius: 10px;
+            width: 800px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid #1D4D63;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .option {
+            background-color: #1f2b45;
+            border: 1px solid #475569;
+            color: white;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+            height: 76px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option.correct {
+            background-color: #00d4ff;
+            color: black;
+        }
+
+        .option.wrong {
+            background-color: #ff5e5e;
+            color: white;
+        }
+
+        .option:hover {
+            background-color: #475569;
+            color: black;
+        }
+
+        .question-box h2 {
+            font-size: 28px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #10192f;
+            padding: 20px;
+            border-radius: 10px;
+            margin-left: 10px;
+            width: 436px;
+            height: 96px;
+            border: 1px solid #1D4D63;
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #87d7ff;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #1f2b45;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 8px;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: #00d4ff;
+            border-radius: 5px;
+        }
+
+        .robot {
+            margin-top: 15px;
+        }
+
+        .box {
+            border: 1px solid #1D4D63;
+            height: 130px;
+            width: 130px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .box p {
+            font-size: 60px;
+        }
+
+        .speak {
+            position: relative;
+            background: #1f2b45;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            width: fit-content;
+            max-width: 300px;
+            font-size: 16px;
+            margin: 20px auto;
+            border: 1px solid #1D4D63;
+        }
+
+        .speak::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #1f2b45;
+        }
+
+        .question {
+            color: white;
+            margin-top: -15px;
+        }
+
+        .result-box {
+            display: none;
+            background-color: #161F32;
+            padding: 20px;
+            border-radius: 10px;
+            width: 800px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid #1D4D63;
+        }
+
+        .result-box h1 {
+            font-size: 40px;
+        }
+
+        .result-box h2 {
+            color: #24D3EE;
+            font-size: 64px;
+            margin-top: 10px;
+        }
+
+        .result-box p {
+            font-size: 16px;
+            color: #FACC14;
+        }
+
+        .result-box .score-percent {
+            color: #24D3EE;
+            font-size: 24px;
+        }
+
+        .switch_game {
+            background-color: #2168E4;
+            height: 40px;
+            width: 244px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .arrow {
+            font-size: 20px;
+            color: white;
+            margin-left: 8px;
+        }
+
+.logo{
+  font-size: 6ch;
+  margin-left: 100px;
+}
+.btn{
+  border: none;
+  outline: none;
+  background: none;
+  color: #4fc3ff ;
+  margin-left: 100px;
+  font-size: 2ch;
+}
+.boxin{
+   border: none;
+  outline: none;
+}
+
+
+ .green-glow-hr {
+    border: none;
+    height: 0.2px;
+    background-color: #4fc3ff ;
+    margin: 30px auto;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    margin-top: -2px;
+  }
+
+.box1{
+  border: none;
+  outline: none;
+  margin-left: 200px;
+}
+
+.boxin svg {
+    vertical-align: middle;
+    transform: translateY(-1px); /* 2px-аар доошлуулна */
+  }
+
+ .buttons {
+    display: flex;
+    gap: 15px;
+  }
+
+  button {
+    background: transparent;
+    border: 2px solid #2a4a7a;
+    color: #4fc3ff;
+    height: 40px;
+    width: 130px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  button:hover {
+    background: #4fc3ff;
+    color: #14253d;
+    border-color: #4fc3ff;
+  }
+  
+  .niit{
+    align-items: center;
+  }
+
+    </style>
+</head>
+
+<body>
+    <div class="niit">
+            <span class="logo"> GoalGo</span>
+<a href="home.html"><button class="btn"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+  <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
+</svg></span> Нүүр </button></a>
+
+<a href="sudl.html"><button class="boxin"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-book" viewBox="0 0 16 16">
+  <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
+</svg></span> Судлах</button></a>
+
+<a href="test.html"><button class="boxin"><span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+</svg></span> Шалгалт</button></a>
+
+<a href="index.html"><button class="boxin"> <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-controller"  viewBox="0 0 16 16">
+  <path d="M11.5 6.027a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m2.5-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m-6.5-3h1v1h1v1h-1v1h-1v-1h-1v-1h1z"/>
+  <path d="M3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .62.39c.655-.079 1.35-.117 2.043-.117.72 0 1.443.041 2.12.126a.5.5 0 0 1 .622-.399l1.932.518a.5.5 0 0 1 .306.729q.211.136.373.297c.408.408.78 1.05 1.095 1.772.32.733.599 1.591.805 2.466s.34 1.78.364 2.606c.024.816-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773-.245-.232-.496-.526-.739-.808-.126-.148-.25-.292-.368-.423-.728-.804-1.597-1.527-3.224-1.527s-2.496.723-3.224 1.527c-.119.131-.242.275-.368.423-.243.282-.494.575-.739.808-.398.38-.877.706-1.513.773a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772a2.3 2.3 0 0 1 .433-.335l-.028-.079zm2.036.412c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a14 14 0 0 0-.748 2.295 12.4 12.4 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.504C4.861 9.969 5.978 9.027 8 9.027s3.139.942 3.965 1.855c.164.181.307.348.44.504.214.251.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.4 12.4 0 0 0-.339-2.406 14 14 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27s-2.063.091-2.913.27"/>
+</svg></span> Тоглоом</button></a>
+
+
+
+<button class="box1">Оноо: 180</button>
+        
+           
+    <hr class="green-glow-hr">
+        
+</div>
+
+    <h1>Химийн <span>Шалгалт</span></h1>
+    <p class="question">Асуулт <span id="questionIndex">1</span>/10</p>
+
+    <div class="sidebar">
+        <div class="status">
+            <div>Оноо</div>
+            <div><span id="score">0</span>/10</div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+
+    <div class="robot">
+        <div class="box">
+            <p>🧪</p>
+        </div>
+    </div>
+
+    <div class="speak">
+        <p>Одоо шалгалтын цаг? Юу сурсанаа<br>харцгаая!</p>
+    </div>
+
+    <div class="question-box" id="quiz-box">
+        <h2 id="question">Фтор-ын химийн тэмдэг юу вэ?</h2>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+        <h1>Шалгалт дууслаа!</h1>
+        <h2 id="final-score">0/10</h2>
+        <div class="score-percent" id="score-percent">0% оноо</div>
+        <p id="medal">🏅0 оноо олсон</p>
+        <a href="index.html"> <button class="switch_game">Тоглоом руу шилжих<span class="arrow">→</span></button></a>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "Фтор-ын химийн тэмдэг юу вэ?", options: ["Ne", "F", "Ar", "Sc"], answer: "F" },
+            { question: "Устөрөгчийн тэмдэг юу вэ?", options: ["H", "O", "N", "He"], answer: "H" },
+            { question: "Нүүрстөрөгчийн тэмдэг?", options: ["Co", "C", "Ca", "Cu"], answer: "C" },
+            { question: "Азотын тэмдэг?", options: ["A", "Na", "N", "Ni"], answer: "N" },
+            { question: "Калийн тэмдэг?", options: ["K", "Ca", "Cl", "Kr"], answer: "K" },
+            { question: "Хүчилтөрөгчийн тэмдэг?", options: ["O", "Ox", "Oz", "H2O"], answer: "O" },
+            { question: "Төмрийн тэмдэг?", options: ["Fe", "Ir", "T", "Tm"], answer: "Fe" },
+            { question: "Магнийн тэмдэг?", options: ["Mn", "Mg", "M", "Ma"], answer: "Mg" },
+            { question: "Натрийн тэмдэг?", options: ["Na", "N", "Ne", "Ni"], answer: "Na" },
+            { question: "Кальцийн тэмдэг?", options: ["Ca", "C", "K", "Cs"], answer: "Ca" }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const scoreEl = document.getElementById("score");
+        const progressEl = document.getElementById("progress");
+        const questionIndexEl = document.getElementById("questionIndex");
+        const quizBox = document.getElementById("quiz-box");
+        const resultBox = document.getElementById("result-box");
+        const finalScoreEl = document.getElementById("final-score");
+        const scorePercentEl = document.getElementById("score-percent");
+        const medalEl = document.getElementById("medal");
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            questionEl.innerText = q.question;
+            questionIndexEl.innerText = currentQuestion + 1;
+            optionsEl.innerHTML = "";
+
+            q.options.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "option";
+                btn.innerText = opt;
+                btn.addEventListener("click", () => checkAnswer(btn, opt));
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(button, selected) {
+            const correct = questions[currentQuestion].answer;
+
+            document.querySelectorAll(".option").forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerText === correct) btn.classList.add("correct");
+                if (btn.innerText === selected && selected !== correct) btn.classList.add("wrong");
+            });
+
+            if (selected === correct) {
+                score++;
+                scoreEl.innerText = score;
+            }
+
+            progressEl.style.width = ((currentQuestion + 1) / questions.length) * 100 + "%";
+
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    loadQuestion();
+                } else {
+                    showEnd();
+                }
+            }, 1000);
+        }
+
+        function showEnd() {
+            quizBox.style.display = "none";
+            resultBox.style.display = "block";
+            finalScoreEl.innerText = `${score}/${questions.length}`;
+            scorePercentEl.innerText = `${Math.round((score / questions.length) * 100)}% оноо`;
+            medalEl.innerText = `🏅${score} оноо олсон`;
+        }
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

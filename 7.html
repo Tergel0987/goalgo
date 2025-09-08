@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoalGo — Block Quiz (Химийн элемент)</title>
+  <style>
+    :root{
+      --bg:#f8fafc; --panel:#ffffff; --grid:#e5e7eb;
+      --cell0:#f1f5f9; --cell1:#60a5fa; --cell2:#22d3ee;
+      --primary:#2563eb; --text:#0f172a; --bad:#ef4444; --ok:#16a34a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:var(--bg); color:var(--text); display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px;
+    }
+    h1{margin:0; font-size:28px}
+    .wrap{display:flex; gap:24px; align-items:flex-start}
+    .board{display:grid; grid-template-columns:repeat(10, 28px); gap:4px; padding:12px; background:var(--panel); border-radius:16px; box-shadow:0 6px 24px rgba(15,23,42,.06)}
+    .cell{width:28px; height:28px; border-radius:6px; border:1px solid var(--grid)}
+    .c0{background:var(--cell0)} .c1{background:var(--cell1); border-color:#3b82f6} .c2{background:var(--cell2); border-color:#06b6d4}
+    aside{width:260px; display:flex; flex-direction:column; gap:12px}
+    .card{background:var(--panel); border-radius:16px; padding:12px 16px; box-shadow:0 6px 24px rgba(15,23,42,.06)}
+    .btn{appearance:none; border:none; background:var(--primary); color:#fff; padding:10px 14px; font-weight:600; border-radius:12px; cursor:pointer}
+    .btn:hover{filter:brightness(.95)}
+
+    .modal{position:fixed; inset:0; background:rgba(15,23,42,.45); display:none; align-items:center; justify-content:center; padding:20px}
+    .modal.open{display:flex}
+    .modal .box{background:#fff; width:min(92vw,560px); border-radius:20px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.25); border:1px solid #e5e7eb}
+    .box h2{font-size:40px; margin:.2rem 0 .25rem}
+    .sub{margin:0 0 10px 0; color:#334155}
+    .choices{display:grid; grid-template-columns:1fr; gap:10px; margin-top:6px}
+    @media (min-width:560px){ .choices{grid-template-columns:1fr 1fr} }
+    .choice{padding:12px 14px; border:1px solid #e5e7eb; border-radius:12px; background:#fff; cursor:pointer; text-align:left; transition:transform .06s ease}
+    .choice:hover{background:#f8fafc}
+    .choice:active{transform:scale(.98)}
+    .err{color:var(--bad); font-size:13px; margin-top:8px; min-height:18px}
+    .hint{color:var(--ok); font-size:13px; margin-top:8px; min-height:18px}
+
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+    .shake{animation:shake .25s linear}
+
+    @media (max-width:900px){ .wrap{flex-direction:column; align-items:center} .board{grid-template-columns:repeat(10, 32px)} .cell{width:32px;height:32px} }
+
+    /* On-screen controls for mobile */
+    .controls{display:flex; gap:8px; flex-wrap:wrap}
+    .ctl{background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:8px 10px; cursor:pointer}
+  </style>
+</head>
+<body>
+  <h1>GoalGo — Block Quiz (Химийн элемент)</h1>
+  <div class="wrap">
+    <div id="board" class="board" aria-label="game board" role="grid" aria-rowcount="16" aria-colcount="10" tabindex="0"></div>
+    <aside>
+      <div class="card" aria-live="polite" aria-atomic="true">
+        <div style="font-size:12px; opacity:.75">Оноо</div>
+        <div id="score" style="font-size:26px; font-weight:700">0</div>
+        <div style="font-size:12px; opacity:.65">Дээд оноо: <span id="best">0</span></div>
+      </div>
+      <div class="card" style="font-size:14px">
+        <div style="font-weight:700; margin-bottom:6px">Удирдлага</div>
+        <ul style="margin:0; padding-left:18px">
+          <li>← / → : зөөх</li>
+          <li>↓ : буулгах</li>
+          <li>Space : шууд унагах</li>
+          <li>R : эргүүлэх</li>
+          <li>P : түр зогсоох/үргэлжлүүлэх</li>
+        </ul>
+        <div class="controls" aria-hidden="false">
+          <button class="ctl" id="ctl-left">←</button>
+          <button class="ctl" id="ctl-right">→</button>
+          <button class="ctl" id="ctl-down">↓</button>
+          <button class="ctl" id="ctl-rotate">R</button>
+          <button class="ctl" id="ctl-drop">⤓</button>
+        </div>
+      </div>
+      <button id="reset" class="btn">Шинэ тоглоом</button>
+    </aside>
+  </div>
+
+  <!-- Асуултын модал -->
+  <div id="quiz" class="modal" role="dialog" aria-modal="true" aria-labelledby="q-title">
+    <div class="box" id="q-box">
+      <div style="text-transform:uppercase; letter-spacing:.08em; font-size:12px; opacity:.75">Асуулт</div>
+      <h2 id="q-title"></h2>
+      <p class="sub">Дараах сонголтоос зөв нэрийг сонгоно уу.</p>
+      <div id="q-choices" class="choices"></div>
+      <div id="q-error" class="err" aria-live="assertive"></div>
+      <div id="q-hint" class="hint" aria-live="polite"></div>
+      <p style="margin-top:10px; font-size:12px; opacity:.75">Зөв хариулбал дараагийн 3 блок гарна.</p>
+    </div>
+  </div>
+
+<script>
+/** SETTINGS **/
+const COLS = 10, ROWS = 16;
+let TICK_MS = 450; // хурд (оноо нэмэгдэхэд буурна)
+const SPAWN_FROM_TOP = true; // ← дээрээс орох эффект
+
+const ELEMENTS = [
+  {symbol:'H',  name:'Устөрөгч'},
+  {symbol:'He', name:'Гели'},
+  {symbol:'Li', name:'Лити'},
+  {symbol:'Be', name:'Бериллий'},
+  {symbol:'B',  name:'Бор'},
+  {symbol:'C',  name:'Нүүрстөрөгч'},
+  {symbol:'N',  name:'Азот'},
+  {symbol:'O',  name:'Хүчилтөрөгч'},
+  {symbol:'F',  name:'Фтор'},
+  {symbol:'Ne', name:'Неон'},
+  {symbol:'Na', name:'Натри'},
+  {symbol:'Mg', name:'Магни'},
+  {symbol:'Al', name:'Хөнгөн цагаан'},
+  {symbol:'Si', name:'Цахиур'},
+  {symbol:'P',  name:'Фосфор'},
+  {symbol:'S',  name:'Хүхэр'},
+  {symbol:'Cl', name:'Хлор'},
+  {symbol:'K',  name:'Кали'},
+  {symbol:'Ca', name:'Кальци'},
+  {symbol:'Fe', name:'Төмөр'}
+];
+const ALL_NAMES = [...new Set(ELEMENTS.map(e => e.name))];
+
+/** STATE **/
+let board = createEmpty();
+let shapeKey = 'H'; // 'H' or 'V'
+let x = 3, y = 0;
+let locked = false, asking = false, paused = false;
+let score = 0, best = Number(localStorage.getItem('goalgo_best')||0);
+let loopId = null;
+let spawnBuffer = 0; // зөв хариултын дараа хэдэн удаа spawn хийх вэ ("дараагийн 3 блок")
+
+/** DOM **/
+const elBoard = document.getElementById('board');
+const elScore = document.getElementById('score');
+const elBest  = document.getElementById('best');
+const elReset = document.getElementById('reset');
+const elQuiz = document.getElementById('quiz');
+const elQTitle = document.getElementById('q-title');
+const elQChoices = document.getElementById('q-choices');
+const elQError = document.getElementById('q-error');
+const elQHint = document.getElementById('q-hint');
+
+/** INIT **/
+renderBoard(board);
+updateScore();
+spawn(); startLoop();
+
+elReset.addEventListener('click', reset);
+window.addEventListener('keydown', onKey, {passive:false});
+['ctl-left','ctl-right','ctl-down','ctl-rotate','ctl-drop'].forEach(id=>{
+  const b = document.getElementById(id);
+  b.addEventListener('click', () => {
+    if(id==='ctl-left') move(-1,0);
+    if(id==='ctl-right') move(1,0);
+    if(id==='ctl-down') move(0,1);
+    if(id==='ctl-rotate') rotate();
+    if(id==='ctl-drop') hardDrop();
+  });
+});
+
+/** CORE **/
+function createEmpty(){ return Array.from({length: ROWS}, () => Array(COLS).fill(0)); }
+const SHAPES = { H: [[1,1,1]], V: [[1],[1],[1]] };
+
+function spawn(){
+  const horiz = Math.random() < .7;
+  shapeKey = horiz ? 'H' : 'V';
+  x = horiz ? 3 : 4;
+  y = SPAWN_FROM_TOP ? -1 : 0;
+  locked = false;
+
+  // шууд зур (y=-1 үед харагдахгүй нь OK)
+  draw();
+
+  // Дараагийн frame дээр y=0 болгож харагдуулна
+  if (SPAWN_FROM_TOP) {
+    requestAnimationFrame(() => {
+      if (canPlace(board, SHAPES[shapeKey], x, 0)) { y = 0; draw(); }
+    });
+  }
+
+  // Хэрэв spawn боломжгүй бол шинэ тоглоом
+  if(!canPlace(board, SHAPES[shapeKey], x, Math.max(0,y))){
+    gameOver();
+  }
+}
+
+function gameOver(){
+  board = createEmpty(); score = 0; updateScore(); y = 0; draw();
+}
+
+function startLoop(){ stopLoop(); loopId = setInterval(tick, TICK_MS); }
+function stopLoop(){ if(loopId) clearInterval(loopId); loopId = null; }
+
+function tick(){
+  if(paused || locked || asking) return;
+  const ny = y + 1;
+  if(canPlace(board, SHAPES[shapeKey], x, ny)){
+    y = ny; draw();
+  } else {
+    lockCurrent();
+  }
+}
+
+function lockCurrent(){
+  board = merge(board, SHAPES[shapeKey], x, y, 1);
+  const { newBoard, cleared } = clearLines(board);
+  board = newBoard;
+  if(cleared){ score += cleared * 100; updateScore(); }
+  locked = true;
+  askQuestion();
+}
+
+function updateScore(){
+  elScore.textContent = String(score);
+  if(score>best){ best=score; localStorage.setItem('goalgo_best', String(best)); }
+  elBest.textContent = String(best);
+  // хурд багахан өсгөнө (доод хязгаар 160мс)
+  const level = Math.floor(score/300);
+  const newTick = Math.max(160, 450 - level*30);
+  if(newTick !== TICK_MS){ TICK_MS = newTick; startLoop(); }
+}
+
+function canPlace(b, shape, px, py){
+  for(let r=0;r<shape.length;r++){
+    for(let c=0;c<shape[0].length;c++){
+      if(!shape[r][c]) continue;
+      const nx = px + c, ny = py + r;
+      if(nx < 0 || nx >= COLS || ny >= ROWS) return false;
+      if(ny >= 0 && b[ny][nx]) return false;
+    }
+  } return true;
+}
+
+function merge(b, shape, px, py, val){
+  const out = b.map(row => row.slice());
+  for(let r=0;r<shape.length;r++){
+    for(let c=0;c<shape[0].length;c++){
+      if(!shape[r][c]) continue;
+      const nx = px + c, ny = py + r;
+      if(ny>=0 && ny<ROWS && nx>=0 && nx<COLS) out[ny][nx] = val;
+    }
+  } return out;
+}
+
+function clearLines(b){
+  const kept = b.filter(row => row.some(cell => cell === 0));
+  const cleared = ROWS - kept.length;
+  const filler = Array.from({length: cleared}, () => Array(COLS).fill(0));
+  return { newBoard: filler.concat(kept), cleared };
+}
+
+function draw(){
+  const preview = merge(board, SHAPES[shapeKey], x, y, 2);
+  renderBoard(preview);
+}
+
+function renderBoard(grid){
+  elBoard.innerHTML = '';
+  grid.forEach((row, ri) => row.forEach((cell, ci) => {
+    const d = document.createElement('div');
+    d.className = 'cell ' + (cell===0?'c0':cell===1?'c1':'c2');
+    d.setAttribute('role','gridcell');
+    d.setAttribute('aria-rowindex', String(ri+1));
+    d.setAttribute('aria-colindex', String(ci+1));
+    elBoard.appendChild(d);
+  }));
+}
+
+/** CONTROLS **/
+function onKey(e){
+  // зөвхөн тоглоомын товчлуурууд дээр default-ыг болиулна (ялангуяа Space-scroll)
+  const keys = ['ArrowLeft','ArrowRight','ArrowDown',' ','Space','r','R','p','P'];
+  if(keys.includes(e.key) || e.code==='Space'){ e.preventDefault(); }
+  if(paused || locked || asking) {
+    if((e.key==='p'||e.key==='P')) togglePause();
+    return;
+  }
+  if(e.key === 'ArrowLeft'){ move(-1,0); }
+  else if(e.key === 'ArrowRight'){ move(1,0); }
+  else if(e.key === 'ArrowDown'){ move(0,1); }
+  else if(e.code === 'Space'){ hardDrop(); }
+  else if(e.key && (e.key==='r'||e.key==='R')){ rotate(); }
+  else if(e.key && (e.key==='p'||e.key==='P')){ togglePause(); }
+}
+
+function move(dx, dy){
+  if(locked || asking || paused) return;
+  if(canPlace(board, SHAPES[shapeKey], x+dx, y+dy)) { x+=dx; y+=dy; draw(); }
+}
+
+function rotate(){
+  const next = shapeKey === 'H' ? 'V' : 'H';
+  if(canPlace(board, SHAPES[next], x, y)) { shapeKey = next; draw(); }
+}
+
+function hardDrop(){
+  if(locked || asking || paused) return;
+  let ny = y; while(canPlace(board, SHAPES[shapeKey], x, ny+1)) ny++;
+  y = ny; draw();
+  lockCurrent(); // шууд түгжинэ (өмнөх хувилбарт дараагийн tick хүртэл хүлээж болох байв)
+}
+
+function togglePause(){
+  paused = !paused;
+}
+
+/** QUIZ **/
+function askQuestion(){
+  asking = true; paused = true; // асуулт дээр хурд зогсоно
+  const el = ELEMENTS[Math.floor(Math.random()*ELEMENTS.length)];
+  const choices = shuffle([el.name, ...pickN(ALL_NAMES.filter(n => n !== el.name), 3)]);
+  elQTitle.textContent = el.symbol;
+  elQChoices.innerHTML = '';
+  elQError.textContent = '';
+  elQHint.textContent = '';
+
+  choices.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.textContent = opt;
+    btn.setAttribute('aria-label', `Сонголт: ${opt}`);
+    btn.onclick = () => onAnswer(btn, opt, el.name, el.symbol);
+    elQChoices.appendChild(btn);
+  });
+  elQuiz.classList.add('open');
+  // анхны товч дээр фокус өгнө
+  setTimeout(()=>{ const first = elQChoices.querySelector('button'); first && first.focus(); }, 0);
+}
+
+function onAnswer(btn, opt, correct, symbol){
+  if(opt === correct){
+    score += 50; updateScore();
+    elQHint.textContent = `${symbol} = ${correct}`;
+    spawnBuffer = 3; // дараагийн 3 блок spawn
+    closeQuiz();
+    // 3 блокыг дарааллан spawn хийе
+    for(let i=0;i<spawnBuffer;i++) spawn();
+    spawnBuffer = 0;
+    paused = false; locked = false;
+  } else {
+    elQError.textContent = 'Буруу. Дахин оролдоно уу.';
+    btn.classList.add('shake');
+    setTimeout(() => btn.classList.remove('shake'), 300);
+  }
+}
+
+function closeQuiz(){
+  elQuiz.classList.remove('open');
+  elBoard.focus();
+}
+
+/** HELPERS **/
+function pickN(arr, n){ const c = arr.slice(); const out=[]; while(out.length<n && c.length){ out.push(c.splice(Math.floor(Math.random()*c.length),1)[0]); } return out; }
+function shuffle(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]] } return arr; }
+
+function reset(){
+  board = createEmpty(); shapeKey='H'; x=3; y=0; locked=false; asking=false; score=0; updateScore(); draw(); spawn(); paused=false;
+}
+</script>
+</body>
+</html>

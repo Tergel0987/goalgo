@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Химийн элемент - Blast</title>
+    <link rel="stylesheet" href="blast.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="score-board">Оноо: <span id="score">0</span></div>
+        <div id="timer-board">Цаг: <span id="timer">60</span></div>
+        <div id="target-element-name"></div>
+        
+        <div id="bubble-slots"></div>
+        
+        <div id="gun-container">
+            <div id="gun">
+                <span id="gun-text"></span>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="game-over-screen" class="hidden">
+        <h2>Тоглоом дууслаа!</h2>
+        <p>Таны авсан оноо: <span id="final-score">0</span></p>
+        <button id="restart-button">Дахин тоглох</button>
+    </div>
+
+    <script>
+        const elements = [
+    { name: "Ус төрөгч", symbol: "H" },
+    { name: "Гели", symbol: "He" },
+    { name: "Лити", symbol: "Li" },
+    { name: "Берилли", symbol: "Be" },
+    { name: "Бор", symbol: "B" }
+];
+
+let score = 0;
+let targetElement = null;
+let timeLeft = 60;
+let timerInterval; 
+
+const gameContainer = document.getElementById('game-container');
+const scoreElement = document.getElementById('score');
+const timerElement = document.getElementById('timer'); 
+const targetElementName = document.getElementById('target-element-name');
+const bubbleSlotsContainer = document.getElementById('bubble-slots');
+const gameOverScreen = document.getElementById('game-over-screen');
+const finalScoreElement = document.getElementById('final-score');
+const restartButton = document.getElementById('restart-button');
+const gunContainer = document.getElementById('gun-container');
+
+const bubblePositions = [
+    { x: 150, y: 150 },
+    { x: 450, y: 150 },
+    { x: 150, y: 350 },
+    { x: 450, y: 350 }
+];
+
+let currentBubbles = {};
+let animationFrameId;
+
+function startGame() {
+    score = 0;
+    timeLeft = 60; 
+    scoreElement.textContent = score;
+    timerElement.textContent = timeLeft;
+    gameOverScreen.classList.add('hidden');
+    bubbleSlotsContainer.innerHTML = '';
+    currentBubbles = {};
+    
+    populateBubbles();
+    setNewTarget();
+    animateBubbles();
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+        }
+    }, 1000);
+    
+    gameContainer.addEventListener('mousemove', handleMouseMove);
+    bubbleSlotsContainer.addEventListener('click', handleBubbleClick);
+}
+
+function populateBubbles() {
+    for (let i = 0; i < bubblePositions.length; i++) {
+        spawnNewBubble(i, bubblePositions[i].x, bubblePositions[i].y);
+    }
+}
+
+function spawnNewBubble(slotIndex, x, y) {
+    const symbolsOnScreen = Object.values(currentBubbles).map(b => b.dataset.symbol);
+    const availableSymbols = elements.map(el => el.symbol).filter(s => !symbolsOnScreen.includes(s));
+    
+    const newSymbol = availableSymbols[Math.floor(Math.random() * availableSymbols.length)];
+    
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    bubble.textContent = newSymbol;
+    bubble.dataset.symbol = newSymbol;
+    bubble.dataset.slotIndex = slotIndex;
+    bubble.style.left = `${x}px`;
+    bubble.style.top = `${y}px`;
+    
+    const speed = Math.random() * 2 + 1;
+    const angle = Math.random() * 2 * Math.PI;
+    
+    bubble.vx = Math.cos(angle) * speed;
+    bubble.vy = Math.sin(angle) * speed;
+    
+    bubbleSlotsContainer.appendChild(bubble);
+    currentBubbles[slotIndex] = bubble;
+}
+
+function animateBubbles() {
+    Object.values(currentBubbles).forEach(bubble => {
+        let newX = parseFloat(bubble.style.left) + bubble.vx;
+        let newY = parseFloat(bubble.style.top) + bubble.vy;
+
+        const bubbleSize = 80;
+        const containerWidth = gameContainer.clientWidth;
+        const containerHeight = gameContainer.clientHeight;
+        
+        if (newX <= 0 || newX + bubbleSize >= containerWidth) {
+            bubble.vx *= -1;
+            newX = parseFloat(bubble.style.left);
+        }
+        if (newY <= 0 || newY + bubbleSize >= containerHeight) {
+            bubble.vy *= -1;
+            newY = parseFloat(bubble.style.top);
+        }
+        
+        bubble.style.left = `${newX}px`;
+        bubble.style.top = `${newY}px`;
+    });
+    
+    animationFrameId = requestAnimationFrame(animateBubbles);
+}
+
+function handleMouseMove(event) {
+    const gunRect = gunContainer.getBoundingClientRect();
+    const gameContainerRect = gameContainer.getBoundingClientRect();
+    const gunX = (gunRect.left + gunRect.width / 2) - gameContainerRect.left;
+    const gunY = (gunRect.top + gunRect.height / 2) - gameContainerRect.top;
+    
+    const mouseX = event.clientX - gameContainerRect.left;
+    const mouseY = event.clientY - gameContainerRect.top;
+
+    const angle = Math.atan2(mouseY - gunY, mouseX - gunX);
+    gunContainer.style.transform = `translateX(-50%) rotate(${angle + Math.PI / 2}rad)`;
+}
+
+function setNewTarget() {
+    const symbolsOnScreen = Object.values(currentBubbles).map(b => b.dataset.symbol);
+    const availableElements = elements.filter(el => symbolsOnScreen.includes(el.symbol));
+
+    if (availableElements.length === 0) {
+        endGame();
+        return;
+    }
+
+    targetElement = availableElements[Math.floor(Math.random() * availableElements.length)];
+    targetElementName.textContent = targetElement.name;
+}
+
+function shoot(bubble, colorClass) {
+    const laser = document.createElement('div');
+    laser.classList.add('laser-beam', colorClass);
+
+    const gunRect = gunContainer.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+    const gameContainerRect = gameContainer.getBoundingClientRect();
+    
+    const gunX = (gunRect.left + gunRect.width / 2) - gameContainerRect.left;
+    const gunY = (gunRect.top + gunRect.height / 2) - gameContainerRect.top;
+    
+    const bubbleX = (bubbleRect.left + bubbleRect.width / 2) - gameContainerRect.left;
+    const bubbleY = (bubbleRect.top + bubbleRect.height / 2) - gameContainerRect.top;
+    
+    const distance = Math.sqrt(Math.pow(bubbleX - gunX, 2) + Math.pow(bubbleY - gunY, 2));
+    const bubbleRadius = bubbleRect.width / 2;
+    const finalDistance = distance - bubbleRadius;
+
+    const angle = Math.atan2(bubbleY - gunY, bubbleX - gunX);
+    
+    laser.style.left = `${gunX}px`;
+    laser.style.top = `${gunY}px`;
+    laser.style.width = `${finalDistance}px`;
+    laser.style.transform = `rotate(${angle}rad)`;
+    
+    gameContainer.appendChild(laser);
+    
+    setTimeout(() => {
+        laser.remove();
+    }, 200);
+}
+
+function explode(bubble, colorClass) {
+    shoot(bubble, colorClass);
+    
+    if (colorClass === 'correct') {
+        bubble.classList.add('exploding', colorClass);
+        bubble.style.pointerEvents = 'none';
+        
+        bubble.vx = 0;
+        bubble.vy = 0;
+
+        setTimeout(() => {
+            const slotIndex = bubble.dataset.slotIndex;
+            bubble.remove();
+            delete currentBubbles[slotIndex];
+            
+            const x = parseFloat(bubble.style.left);
+            const y = parseFloat(bubble.style.top);
+            spawnNewBubble(slotIndex, x, y);
+            
+            setNewTarget();
+        }, 500);
+    } else {
+        bubble.classList.add(colorClass);
+        setTimeout(() => {
+            bubble.classList.remove(colorClass);
+        }, 300);
+    }
+}
+
+function handleBubbleClick(event) {
+    const clickedBubble = event.target.closest('.bubble');
+    if (!clickedBubble) {
+        return;
+    }
+    
+    if (clickedBubble.dataset.symbol === targetElement.symbol) {
+        score += 10;
+        scoreElement.textContent = score;
+        explode(clickedBubble, 'correct');
+    } else {
+        explode(clickedBubble, 'incorrect');
+    }
+}
+
+function endGame() {
+    cancelAnimationFrame(animationFrameId);
+    clearInterval(timerInterval); 
+    
+    finalScoreElement.textContent = score;
+    gameOverScreen.classList.remove('hidden');
+    bubbleSlotsContainer.removeEventListener('click', handleBubbleClick);
+    gameContainer.removeEventListener('mousemove', handleMouseMove);
+}
+
+restartButton.addEventListener('click', () => {
+    location.reload();
+});
+
+startGame();
+    </script>
+</body>
+</html>

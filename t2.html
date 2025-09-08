@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Химийн блок</title>
+    <link rel="stylesheet" href="t2.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Химийн блок</h1>
+        <div class="info-panel">
+            <div id="score">Оноо: 0</div>
+            <div id="attempts">Оролдлого: 0</div>
+        </div>
+        <div class="card-grid">
+            </div>
+        <button id="restart-btn">Дахин эхлүүлэх</button>
+    </div>
+    <div class="win-popup hidden">
+        <div class="popup-content">
+            <h2>Баяр хүргэе!</h2>
+            <p>Та бүх картыг тааруулж чадлаа!</p>
+            <p id="win-message"></p>
+            <button id="close-popup-btn">OK</button>
+        </div>
+    </div>
+    <script>
+        const elements = [
+    { id: 1, value: "H", type: "symbol" },
+    { id: 1, value: "Ус төрөгч", type: "name" },
+    { id: 2, value: "He", type: "symbol" },
+    { id: 2, value: "Гели", type: "name" },
+    { id: 3, value: "Li", type: "symbol" },
+    { id: 3, value: "Лити", type: "name" },
+    { id: 4, value: "C", type: "symbol" },
+    { id: 4, value: "Нүүрс төрөгч", type: "name" },
+    { id: 5, value: "O", type: "symbol" },
+    { id: 5, value: "Хүчил төрөгч", type: "name" },
+    { id: 6, value: "Fe", type: "symbol" },
+    { id: 6, value: "Төмөр", type: "name" },
+    { id: 7, value: "Na", type: "symbol" },
+    { id: 7, value: "Натри", type: "name" },
+    { id: 8, value: "Cl", type: "symbol" },
+    { id: 8, value: "Хлор", type: "name" }
+];
+
+const cardGrid = document.querySelector('.card-grid');
+const scoreDisplay = document.getElementById('score');
+const attemptsDisplay = document.getElementById('attempts');
+const restartBtn = document.getElementById('restart-btn');
+const winPopup = document.querySelector('.win-popup');
+const winMessage = document.getElementById('win-message');
+const closePopupBtn = document.getElementById('close-popup-btn');
+
+let flippedCards = [];
+let matchedPairs = 0;
+let score = 0;
+let attempts = 0;
+let lockBoard = false;
+
+function shuffleCards(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function createBoard() {
+    const shuffledElements = shuffleCards(elements);
+    shuffledElements.forEach(element => {
+        const cardWrapper = document.createElement('div');
+        cardWrapper.classList.add('card-wrapper');
+        cardWrapper.dataset.id = element.id;
+
+        const cardBack = document.createElement('div');
+        cardBack.classList.add('card', 'card-back');
+        cardBack.textContent = '?';
+
+        const cardFront = document.createElement('div');
+        cardFront.classList.add('card', 'card-front');
+        cardFront.textContent = element.value;
+
+        cardWrapper.appendChild(cardBack);
+        cardWrapper.appendChild(cardFront);
+        cardGrid.appendChild(cardWrapper);
+        
+        cardWrapper.addEventListener('click', flipCard);
+    });
+}
+
+function flipCard() {
+    if (lockBoard || this === flippedCards[0] || this.classList.contains('matched')) return;
+
+    this.classList.add('flip');
+    flippedCards.push(this);
+
+    if (flippedCards.length === 2) {
+        lockBoard = true;
+        attempts++;
+        attemptsDisplay.textContent = `Оролдлого: ${attempts}`;
+        checkForMatch();
+    }
+}
+
+function checkForMatch() {
+    const [card1, card2] = flippedCards;
+    const isMatch = card1.dataset.id === card2.dataset.id;
+
+    if (isMatch) {
+        score++;
+        scoreDisplay.textContent = `Оноо: ${score}`;
+        card1.classList.add('matched');
+        card2.classList.add('matched');
+        matchedPairs++;
+        resetBoard();
+        if (matchedPairs === elements.length / 2) {
+            setTimeout(showWinPopup, 500);
+        }
+    } else {
+        setTimeout(() => {
+            card1.classList.remove('flip');
+            card2.classList.remove('flip');
+            resetBoard();
+        }, 1000);
+    }
+}
+
+function resetBoard() {
+    flippedCards = [];
+    lockBoard = false;
+}
+
+function showWinPopup() {
+    winMessage.textContent = `Та ${attempts} оролдлогоор бүх картыг оллоо!`;
+    winPopup.classList.remove('hidden');
+}
+
+function restartGame() {
+    cardGrid.innerHTML = '';
+    flippedCards = [];
+    matchedPairs = 0;
+    score = 0;
+    attempts = 0;
+    scoreDisplay.textContent = 'Оноо: 0';
+    attemptsDisplay.textContent = 'Оролдлого: 0';
+    winPopup.classList.add('hidden');
+    createBoard();
+}
+
+restartBtn.addEventListener('click', restartGame);
+closePopupBtn.addEventListener('click', restartGame);
+
+createBoard();
+    </script>
+</body>
+</html>

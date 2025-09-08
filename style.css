@@ -1,0 +1,204 @@
+.logo{
+  font-size: 6.65ch;
+  margin-left: 150px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.btn{
+  border: none;
+  outline: none;
+  background-color: none;
+  color: #4fc3ff;
+  margin-left: 100px;
+  font-size: 2ch;
+}
+.boxin{
+   border: none;
+  outline: none;
+  padding: 5px;
+
+}
+
+
+ .green-glow-hr {
+    border: none;
+    height: 0.2px;
+    background-color: #4fc3ff ;
+    margin: 30px auto;
+    width: 100%;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    margin-top: -2px;
+  }
+
+.box1{
+  border: none;
+  outline: none;
+  margin-left: 200px;
+}
+
+.boxin svg {
+    vertical-align: middle;
+    transform: translateY(-1px); /* 2px-аар доошлуулна */
+  }
+
+ .buttons {
+    display: flex;
+    gap: 15px;
+  }
+
+  button {
+    background: transparent;
+    border: 2px solid #2a4a7a;
+    color: #4fc3ff;
+    height: 40px;
+    width: 130px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  button:hover {
+    background: #4fc3ff;
+    color: #14253d;
+    border-color: #4fc3ff;
+  }
+  
+  .niit{
+    align-items: center;
+  }
+body {
+    background-color: #0f172a;
+    color: #ffffff;
+    margin: 0;
+}
+.garcig {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 20px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.garcig2 {
+    text-align: center;
+    font-size: 16px;
+    margin-top: -15px;
+    color: #4fc3ff;
+}
+.cards {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+      margin-top: 50px;
+      ;
+    }
+
+    .card {
+      background: #12193e;
+      border: 1px solid #2d3c70;
+      border-radius: 15px;
+      padding: 25px;
+      width: 220px;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      margin: 10px 0;
+      color: #ffffff;
+    }
+
+    .card p {
+      color: #cccccc;
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: none;
+      color: #00ccff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .btn.red { background-color: #ff4477; }
+    .btn.purple { background-color: #6a6aff; }
+    .btn.green { background-color: #00dd88; }
+
+
+.robot-container {
+    
+    padding: 20px 40px;
+    border-radius: 12px;
+   /* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);*/
+    position: relative;
+    width: 320px;
+    text-align: center;
+    margin-top: 10px;
+    margin-left: 100px;
+  } 
+
+  .robot-icon {
+    width: 80px;
+    height: 80px;
+    background: #153261;
+    border-radius: 16px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  /* Роботын дүрс зурах орлуулга */
+  .robot-icon::before {
+    content: "⚡";
+    font-size: 64px;
+    line-height: 80px;
+    display: block;
+    text-align: center;
+  }
+
+  /* Tooltip box */
+  .tooltip {
+    background: #2a3a5c;
+    color: #d3dffa;
+    padding: 15px 20px;
+    border-radius: 12px;
+    position: relative;
+    font-size: 16px;
+    width: 250px;
+    line-height: 1.4;
+     border: 1px solid #24D3EE;
+  }
+  .tooltip::after {
+  content: "";
+  position: absolute;
+  top: -10px; /* Доороос биш дээшээс байрлуулах */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 10px 10px 10px; /* Дээш харсан гурвалжин */
+  border-style: solid;
+  border-color: transparent transparent #2a3a5c transparent; /* Доош биш дээш өнгө */
+}
+
+.row{
+    display: flex;
+}
+
+.version{
+    margin-top: 10px;
+    color: #5272b6;
+}
+

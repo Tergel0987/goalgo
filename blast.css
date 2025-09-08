@@ -1,0 +1,198 @@
+:root {
+    --primary-bg-color: #0d122b;
+    --secondary-bg-color: #1e2851;
+    --ui-color: #5a70d8;
+    --text-color: #ffffff;
+    --correct-color: #4CAF50;
+    --incorrect-color: #f44336;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: var(--primary-bg-color);
+    background-image: radial-gradient(circle, var(--secondary-bg-color) 0%, var(--primary-bg-color) 100%);
+    overflow: hidden;
+    color: var(--text-color);
+    cursor: crosshair;
+}
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background-color: var(--secondary-bg-color);
+    overflow: hidden;
+    border: 3px solid var(--ui-color);
+    box-shadow: 0 0 20px rgba(90, 112, 216, 0.5);
+    border-radius: 10px;
+}
+
+#score-board, #timer-board {
+    position: absolute;
+    top: 25px;
+    font-size: 1.5em;
+    font-weight: bold;
+    background: rgba(20, 28, 61, 0.7);
+    padding: 8px 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(90, 112, 216, 0.3);
+}
+
+#score-board {
+    left: 20px;
+}
+
+#timer-board {
+    right: 20px;
+}
+
+#target-element-name {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px 20px;
+    background: rgba(20, 28, 61, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3), 0 0 15px rgba(90, 112, 216, 0.5);
+    text-shadow: 0 0 8px var(--ui-color);
+}
+
+.bubble {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #3b4c95 0%, #2e3b6f 100%);
+    border: 2px solid var(--ui-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--text-color);
+    cursor: pointer;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.2), 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease-out, left 0.1s linear, top 0.1s linear;
+}
+
+.bubble.exploding {
+    animation: explode 0.5s ease-out forwards;
+}
+
+.bubble.correct {
+    background-color: var(--correct-color);
+    border-color: var(--correct-color);
+    box-shadow: 0 0 20px var(--correct-color);
+}
+
+.bubble.incorrect {
+    background-color: var(--incorrect-color);
+    border-color: var(--incorrect-color);
+    box-shadow: 0 0 20px var(--incorrect-color);
+}
+
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+#gun-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    transform: translateX(-50%);
+    transform-origin: center;
+    z-index: 10;
+}
+
+#gun {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #d8212a 0%, #c92944 100%);
+    border: 5px solid var(--ui-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, 0);
+    box-shadow: 0 0 15px rgba(194, 18, 41, 0.5);
+}
+
+#gun-text {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.laser-beam {
+    position: absolute;
+    height: 5px;
+    background: var(--text-color);
+    transform-origin: left center;
+    transition: width 0.1s;
+    z-index: 9;
+}
+
+.laser-beam.correct {
+    background: var(--correct-color);
+    box-shadow: 0 0 10px var(--correct-color);
+}
+
+.laser-beam.incorrect {
+    background: var(--incorrect-color);
+    box-shadow: 0 0 10px var(--incorrect-color);
+}
+
+.hidden {
+    display: none;
+}
+
+#game-over-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 40, 81, 0.9);
+    padding: 30px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    z-index: 10;
+    color: var(--text-color);
+    border: 2px solid var(--ui-color);
+}
+
+#game-over-screen h2 {
+    text-shadow: 0 0 10px var(--ui-color);
+}
+
+#restart-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 15px;
+    background: var(--ui-color);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    transition: transform 0.2s;
+}
+
+#restart-button:hover {
+    transform: scale(1.05);
+    background: #7a8efc;
+}
